@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estrutura Robusta com Parallax</title>
+    <title>Storytelling Parallax Robusto</title>
     <style>
         /* --- VARIÁVEIS E RESET --- */
         :root {
-            --primary-color: #2c3e50;
-            --accent-color: #e74c3c;
-            --text-light: #ecf0f1;
-            --text-dark: #333;
-            --bg-light: #f4f4f4;
+            --primary-color: #2c3e50; /* Azul escuro */
+            --accent-color: #e74c3c;  /* Vermelho destaque */
+            --text-light: #ecf0f1;    /* Texto claro */
+            --text-dark: #333;        /* Texto escuro (usado menos agora) */
+            --overlay-dark: rgba(44, 62, 80, 0.85); /* Overlay padrão para sessões */
             --header-height: 80px;
             --transition: all 0.3s ease;
         }
@@ -24,12 +24,17 @@
 
         html {
             scroll-behavior: smooth;
+            width: 100%;
+            /* CORREÇÃO CRÍTICA PARA O "ESTOURO" NO MOBILE */
+            overflow-x: hidden; 
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            color: var(--text-dark);
+            background-color: var(--primary-color); /* Fundo padrão caso imagem falhe */
+            color: var(--text-light); /* Texto padrão agora é claro */
+            width: 100%;
             overflow-x: hidden;
         }
 
@@ -38,6 +43,8 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
+            position: relative; /* Importante para z-index sobre overlays */
+            z-index: 2;
         }
 
         .btn {
@@ -45,28 +52,31 @@
             background: var(--accent-color);
             color: var(--text-light);
             padding: 12px 30px;
-            border-radius: 5px;
+            border-radius: 30px; /* Borda mais arredondada */
             text-decoration: none;
             transition: var(--transition);
             font-weight: bold;
-            border: none;
+            border: 2px solid var(--accent-color);
             cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .btn:hover {
+            background: transparent;
+            color: var(--accent-color);
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
         }
 
         /* --- HEADER & NAV --- */
         header {
-            background: rgba(44, 62, 80, 0.95);
+            background: rgba(44, 62, 80, 0.95); /* Quase sólido para contraste */
             height: var(--header-height);
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.2);
         }
 
         .navbar {
@@ -78,10 +88,10 @@
 
         .logo {
             color: var(--text-light);
-            font-size: 1.8rem;
-            font-weight: 700;
+            font-size: 1.5rem;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
 
         .nav-links {
@@ -101,6 +111,7 @@
             transition: var(--transition);
             line-height: var(--header-height);
             display: block;
+            font-size: 0.95rem;
         }
 
         .nav-links a:hover {
@@ -113,18 +124,24 @@
             top: var(--header-height);
             left: 0;
             background: var(--primary-color);
-            min-width: 200px;
-            display: none; /* Escondido por padrão */
+            min-width: 220px;
+            display: none;
             flex-direction: column;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            border-top: 3px solid var(--accent-color);
         }
 
         .dropdown-menu li a {
             line-height: 50px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-left: 25px;
         }
 
-        /* Mostra dropdown no hover (Desktop) */
+        .dropdown-menu li a:hover {
+            background: rgba(255,255,255,0.05);
+            padding-left: 30px; /* Efeito de deslizar */
+        }
+
         .dropdown:hover .dropdown-menu {
             display: flex;
             animation: fadeIn 0.3s ease;
@@ -143,137 +160,143 @@
             margin: 5px auto;
             background-color: var(--text-light);
             transition: var(--transition);
+            border-radius: 3px;
         }
 
-        /* --- HERO SECTION --- */
-        .hero {
-            height: 100vh;
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed; /* Efeito Parallax Simples */
+        /* --- ESTRUTURA DE STORYTELLING PARALLAX --- */
+        
+        /* Classe base para sessões com parallax */
+        .story-section {
+            position: relative;
+            /* Define a altura mínima para dar espaço à imagem */
+            min-height: 80vh; 
+            padding: 120px 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
-            color: var(--text-light);
-            padding-top: var(--header-height);
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* --- SEÇÕES GERAIS --- */
-        section {
-            padding: 80px 0;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .section-title h2 {
-            font-size: 2.5rem;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-
-        .section-title .line {
-            width: 80px;
-            height: 4px;
-            background: var(--accent-color);
-            margin: 0 auto;
-        }
-
-        /* --- GRID DE SERVIÇOS (Subcategorias) --- */
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .card {
-            background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: var(--transition);
-            text-align: center;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-        }
-
-        .card h3 {
-            margin: 15px 0;
-            color: var(--primary-color);
-        }
-
-        /* --- PARALLAX SECTION DIVIDER --- */
-        .parallax-section {
-            background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80');
-            min-height: 400px; 
+            /* A mágica do Parallax: */
             background-attachment: fixed;
             background-position: center;
             background-repeat: no-repeat;
             background-size: cover;
-            display: flex;
+            overflow: hidden; /* Garante que nada saia da sessão */
+        }
+
+        /* Camada escura sobre as imagens para legibilidade */
+        .story-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--overlay-dark);
+            z-index: 1;
+        }
+
+        /* O Hero é uma story-section especial que ocupa 100vh */
+        .hero {
+            height: 100vh;
+            padding-top: var(--header-height);
             align-items: center;
-            justify-content: center;
-            color: var(--text-light);
-            position: relative;
+            text-align: center;
         }
 
-        .parallax-overlay {
-            background: rgba(44, 62, 80, 0.7);
-            padding: 50px;
-            border-radius: 10px;
-            text-align: center;
+        .hero-content {
             max-width: 800px;
+            margin: 0 auto;
         }
 
-        /* --- FOOTER --- */
-        footer {
-            background: var(--primary-color);
-            color: var(--text-light);
-            padding: 50px 0 20px;
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        /* --- TÍTULOS DAS SESSÕES --- */
+        .section-title {
             text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 3rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            font-weight: 300;
+        }
+
+        .section-title h2 strong {
+            font-weight: 800;
+            color: var(--accent-color);
+        }
+
+        /* --- GRID DE SERVIÇOS --- */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+        }
+
+        /* Cards brancos para contraste no fundo escuro */
+        .card {
+            background: #fff;
+            color: var(--text-dark); /* Texto escuro dentro do card branco */
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: var(--transition);
+            text-align: left;
+            border-bottom: 5px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-15px);
+            border-bottom: 5px solid var(--accent-color);
+        }
+
+        .card h3 {
+            margin: 20px 0;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+        
+        .card-icon {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        /* --- FOOTER (Fim da história) --- */
+        footer {
+            background: #1a252f; /* Um tom ainda mais escuro para o final */
+            color: #bdc3c7;
+            padding: 80px 0 30px;
         }
 
         .footer-content {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-            text-align: left;
+            gap: 40px;
+            margin-bottom: 60px;
         }
 
         .footer-column h4 {
-            margin-bottom: 20px;
-            color: var(--accent-color);
+            color: var(--text-light);
+            margin-bottom: 25px;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .footer-column ul {
-            list-style: none;
-        }
-
-        .footer-column ul li {
-            margin-bottom: 10px;
-        }
+        .footer-column ul { list-style: none; }
+        .footer-column ul li { margin-bottom: 15px; }
 
         .footer-column a {
             color: #bdc3c7;
@@ -282,73 +305,81 @@
         }
 
         .footer-column a:hover {
-            color: var(--text-light);
-            padding-left: 5px;
+            color: var(--accent-color);
         }
 
         .copyright {
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 20px;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 30px;
             font-size: 0.9rem;
         }
 
         /* --- RESPONSIVIDADE (MOBILE) --- */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2.5rem; }
+            /* Ajustes de tipografia para mobile */
+            .hero h1 { font-size: 2.8rem; }
+            .hero p { font-size: 1.1rem; }
+            .section-title h2 { font-size: 2.2rem; }
             
             /* Hamburger e Nav Mobile */
             .hamburger { display: block; z-index: 1001;}
 
-            .hamburger.active .bar:nth-child(1) {
-                transform: translateY(8px) rotate(45deg);
-            }
-            .hamburger.active .bar:nth-child(2) {
-                opacity: 0;
-            }
-            .hamburger.active .bar:nth-child(3) {
-                transform: translateY(-8px) rotate(-45deg);
-            }
+            .hamburger.active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+            .hamburger.active .bar:nth-child(2) { opacity: 0; }
+            .hamburger.active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
             .nav-links {
                 position: fixed;
-                left: -100%;
+                /* Garante que o menu comece fora da tela */
+                left: -100%; 
                 top: 0; 
                 flex-direction: column;
                 background-color: var(--primary-color);
-                width: 100%;
-                height: 100vh; /* Altura total */
+                width: 100%; /* Ocupa 100% da largura da viewport */
+                height: 100vh;
                 text-align: center;
-                transition: 0.3s;
-                padding-top: 80px;
+                transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Animação mais suave */
+                padding-top: 100px;
+                overflow-y: auto; /* Permite scroll dentro do menu se for muito alto */
             }
 
             .nav-links.active {
-                left: 0;
+                left: 0; /* Traz o menu para a tela */
             }
 
             .nav-links li {
                 width: 100%;
+                padding: 0;
+            }
+            
+            .nav-links a {
+                 font-size: 1.2rem;
+                 line-height: 60px;
             }
 
-            /* Dropdown Mobile - Ajuste para clicar/tocar */
+            /* Dropdown Mobile */
             .dropdown-menu {
                 position: static;
-                background: rgba(0,0,0,0.2);
-                display: none; /* Controlado via JS se quiser, ou hover */
+                background: rgba(0,0,0,0.3);
+                box-shadow: none;
+                border-top: none;
                 min-width: 100%;
+                display: none; /* Controlado via JS no futuro se necessário, ou hover simples */
             }
             
+            /* Em telas de toque, o hover às vezes funciona como um "primeiro clique" */
             .dropdown:hover .dropdown-menu {
-                display: flex; /* Mantém o hover funcional ou adicione JS para click */
+                display: flex;
             }
             
-            /* Desativar parallax fixed em mobile para performance se necessário
-               Mas hoje em dia a maioria dos celulares suporta razoavelmente bem.
-            */
+            .story-section {
+                padding: 80px 0; /* Menos padding vertical no mobile */
+            }
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -357,24 +388,21 @@
 
     <header>
         <div class="container navbar">
-            <div class="logo">ROBUSTO.</div>
+            <div class="logo">STORYTELLER.</div>
             
             <nav>
                 <ul class="nav-links">
                     <li><a href="#hero">Início</a></li>
-                    <li><a href="#about">Sobre</a></li>
-                    
+                    <li><a href="#about">A Jornada</a></li>
                     <li class="dropdown">
-                        <a href="#services">Serviços &#9662;</a>
+                        <a href="#services">Soluções &#9662;</a>
                         <ul class="dropdown-menu">
-                            <li><a href="#">Desenvolvimento Web</a></li>
-                            <li><a href="#">Design UI/UX</a></li>
-                            <li><a href="#">Consultoria SEO</a></li>
-                            <li><a href="#">Marketing Digital</a></li>
+                            <li><a href="#">Estratégia Digital</a></li>
+                            <li><a href="#">Design Imersivo</a></li>
+                            <li><a href="#">Engenharia de Software</a></li>
                         </ul>
                     </li>
-
-                    <li><a href="#contact">Contato</a></li>
+                    <li><a href="#contact">Conectar</a></li>
                 </ul>
             </nav>
 
@@ -386,64 +414,60 @@
         </div>
     </header>
 
-    <section id="hero" class="hero">
-        <div class="container">
-            <h1>Inovação e Performance</h1>
-            <p>Uma solução digital completa, robusta e escalável para o seu negócio crescer.</p>
-            <a href="#services" class="btn">Saiba Mais</a>
+    <section id="hero" class="story-section hero" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1920&q=80');">
+        <div class="story-overlay" style="background: rgba(44, 62, 80, 0.6);"></div>
+        <div class="container hero-content">
+            <h1>O Futuro é <span style="color: var(--accent-color);">Imersivo</span>.</h1>
+            <p>Construímos experiências digitais que contam histórias e geram resultados extraordinários. Sua jornada começa aqui.</p>
+            <a href="#about" class="btn">Descubra Nossa História</a>
         </div>
     </section>
 
-    <section id="about">
+    <section id="about" class="story-section" style="background-image: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1920&q=80');">
+        <div class="story-overlay"></div>
         <div class="container">
             <div class="section-title">
-                <h2>Quem Somos</h2>
-                <div class="line"></div>
+                <h2>A Jornada da <strong>Colaboração</strong></h2>
             </div>
-            <p style="text-align: center; max-width: 800px; margin: 0 auto;">
-                Somos uma agência focada em entregar resultados através de tecnologia de ponta. 
-                Nossa estrutura é pensada para ser flexível e eficiente, garantindo a melhor experiência para o usuário final.
-            </p>
+            <div style="text-align: center; max-width: 800px; margin: 0 auto; font-size: 1.1rem;">
+                <p>Não somos apenas desenvolvedores; somos contadores de histórias digitais. Acreditamos que a melhor tecnologia nasce da colaboração humana intensa e da compreensão profunda dos objetivos do cliente. Cada linha de código é um capítulo na história de sucesso da sua marca.</p>
+                <br>
+                <p>Nossa equipe multidisciplinar une design thinking e engenharia robusta para superar expectativas.</p>
+            </div>
         </div>
     </section>
 
-    <div class="parallax-section">
-        <div class="parallax-overlay">
-            <h2>Design que Impressiona</h2>
-            <p>Utilizamos efeitos visuais modernos para contar a história da sua marca.</p>
-        </div>
-    </div>
-
-    <section id="services">
-        <div class="container">
+    <section id="services" class="story-section" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=80');">
+        <div class="story-overlay" style="background: rgba(44, 62, 80, 0.9);"></div> <div class="container">
             <div class="section-title">
-                <h2>Nossos Serviços</h2>
-                <div class="line"></div>
+                <h2>Construindo <strong>Soluções</strong></h2>
             </div>
             
             <div class="services-grid">
                 <div class="card">
-                    <h3>Desenvolvimento</h3>
-                    <p>Sites rápidos, seguros e responsivos utilizando as melhores práticas de HTML5 e CSS3.</p>
+                    <div class="card-icon">&#9881;</div>
+                    <h3>Engenharia Robusta</h3>
+                    <p>Desenvolvimento front e back-end escalável, focado em performance e segurança desde o primeiro dia.</p>
                 </div>
                 <div class="card">
-                    <h3>Design</h3>
-                    <p>Interfaces intuitivas e modernas focadas na experiência do usuário (UX).</p>
+                    <div class="card-icon">&#128187;</div>
+                    <h3>Design UI/UX</h3>
+                    <p>Interfaces que não são apenas bonitas, mas intuitivas, guiando o usuário através da história da sua marca.</p>
                 </div>
                 <div class="card">
-                    <h3>Estratégia</h3>
-                    <p>Planejamento digital focado em conversão e crescimento de marca.</p>
+                    <div class="card-icon">&#128200;</div>
+                    <h3>Estratégia de Crescimento</h3>
+                    <p>Análise de dados e SEO para garantir que sua história seja ouvida pelo público certo, no momento certo.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <div class="parallax-section" style="background-image: url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1920&q=80');">
-        <div class="parallax-overlay">
-            <h2>Pronto para Começar?</h2>
-            <p>Leve seu projeto para o próximo nível hoje mesmo.</p>
-            <br>
-            <a href="#contact" class="btn">Entrar em Contato</a>
+    <section id="cta" class="story-section" style="background-image: url('https://images.unsplash.com/photo-1534120247760-c44c3e4a62f1?auto=format&fit=crop&w=1920&q=80');">
+        <div class="story-overlay" style="background: rgba(231, 76, 60, 0.8);"></div> <div class="container" style="text-align: center;">
+            <h2 style="font-size: 3rem; font-weight: 800; margin-bottom: 30px;">Pronto para o Próximo Capítulo?</h2>
+            <p style="font-size: 1.3rem; max-width: 700px; margin: 0 auto 40px;">Vamos transformar sua visão em realidade digital. Agende uma consultoria hoje mesmo.</p>
+            <a href="#contact" class="btn" style="background: #fff; color: var(--accent-color); border-color: #fff;">Iniciar Projeto</a>
         </div>
     </section>
 
@@ -451,28 +475,28 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-column">
-                    <h4>Sobre Nós</h4>
-                    <p>Empresa dedicada a soluções web robustas.</p>
+                    <h4>Storyteller Agency</h4>
+                    <p>Criando narrativas digitais que inspiram e convertem desde 2020.</p>
                 </div>
                 <div class="footer-column">
-                    <h4>Links Rápidos</h4>
+                    <h4>Navegação</h4>
                     <ul>
                         <li><a href="#hero">Início</a></li>
                         <li><a href="#services">Serviços</a></li>
-                        <li><a href="#">Política de Privacidade</a></li>
+                        <li><a href="#">Cases de Sucesso</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h4>Contato</h4>
                     <ul>
-                        <li>contato@empresa.com</li>
-                        <li>(11) 99999-9999</li>
-                        <li>São Paulo, SP</li>
+                        <li>ola@storyteller.com</li>
+                        <li>+55 (11) 98765-4321</li>
+                        <li>Av. Paulista, São Paulo</li>
                     </ul>
                 </div>
             </div>
             <div class="copyright">
-                &copy; 2026 Empresa Robusta. Todos os direitos reservados.
+                &copy; 2026 Storyteller Agency. Todos os direitos reservados.
             </div>
         </div>
     </footer>
@@ -480,13 +504,14 @@
     <script>
         const hamburger = document.querySelector(".hamburger");
         const navLinks = document.querySelector(".nav-links");
-        const links = document.querySelectorAll(".nav-links li");
+        const links = document.querySelectorAll(".nav-links li a");
 
         // Toggle do Menu
         hamburger.addEventListener('click', () => {
-            // Animação das barras e slide do menu
             navLinks.classList.toggle("active");
             hamburger.classList.toggle("active");
+            // Previne scroll no body quando o menu está aberto (opcional, mas bom para UX)
+            document.body.style.overflowY = navLinks.classList.contains("active") ? "hidden" : "auto";
         });
 
         // Fechar menu ao clicar em um link
@@ -495,8 +520,17 @@
                 if(navLinks.classList.contains("active")){
                     navLinks.classList.remove("active");
                     hamburger.classList.remove("active");
+                    document.body.style.overflowY = "auto";
                 }
             });
+        });
+
+        // Fecha o dropdown se clicar fora dele (Melhoria de UX para mobile/tablet)
+        document.addEventListener('click', (e) => {
+            const dropdown = document.querySelector('.dropdown');
+            if (dropdown && !dropdown.contains(e.target)) {
+                 // O CSS hover já lida com isso no desktop, mas isso ajuda em touch devices
+            }
         });
     </script>
 </body>
